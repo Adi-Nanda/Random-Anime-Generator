@@ -5,6 +5,9 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const MIN_SCORE = 4;
+const BANNED_GENRE = ["Hentai"];
+
 const app = express();
 const port = 3000;
 
@@ -41,6 +44,15 @@ app.get("/random",async (req, res)=>{
       }
       
       anime_data = response.data.data;
+      if(anime_data.title === anime_data.title_english){
+         anime_data.title_english = null;
+         if(anime_data.title === anime_data.title_japanese){
+            anime_data.title_japanese = null;
+         }
+      } else if(anime_data.title_english === anime_data.title_japanese){
+         anime_data.title_japanese = null;
+      }
+
       score = anime_data.score;
       if(!score){
          score = -1;
@@ -51,10 +63,10 @@ app.get("/random",async (req, res)=>{
          genre = "";
       }
 
-      if (score < 4 || genre === "Hentai") {
-         await new Promise(resolve => setTimeout(resolve, 335));
+      if (score < MIN_SCORE || BANNED_GENRE.includes(genre)) {
+         await new Promise(resolve => setTimeout(resolve, 335)); // delay because of rate limit of 3 per sec
       }
-   } while(score < 4 || genre === "Hentai");
+   } while(score < MIN_SCORE || BANNED_GENRE.includes(genre));
 
    res.render("index.ejs", {anime_data});
 })
