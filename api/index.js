@@ -19,6 +19,7 @@ var anime_data;
 var error_message;
 
 app.get("/", (req, res)=>{
+   anime_data = null;
    res.render("index.ejs", {anime_data , error_message});
 });
 
@@ -55,7 +56,7 @@ app.get("/random",async (req, res)=>{
       }
    } while(score < 4 || genre === "Hentai");
 
-   res.redirect("/");
+   res.render("index.ejs", {anime_data});
 })
 
 app.listen(port, ()=>{
